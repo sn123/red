@@ -3,6 +3,8 @@
 
 Red is a lightweight webserver for quick file sharing between systems on same network. Red is also a static web server and can help in quickly hosting any folder and making it accessible on the intranet.
 It works well for accessing & downloading files from the system to the phone on the same network.
+
+Binaries can be downloaded from ![releases](https://github.com/sn123/red/releases) page.
 ## How it works
 Copy over the red server into any folder that should be red-ified. Run red, once Red starts it will automatically find the next available port and outbound IP address and will print the QR code on console which can be scanned by the phones to navigate to the server.
 

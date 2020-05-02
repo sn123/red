@@ -10,6 +10,10 @@ Since red relies on Golang's built-in behavior, having an index.html file in the
 
 ![Run](https://github.com/sn123/red/raw/master/screenshots/screenshot.png)
 
+On the phone, point your camera to the QR code
+
+![Phone](https://github.com/sn123/red/raw/master/screenshots/phone.gif)
+
 ### Running from source
 ```bash
 $ go build

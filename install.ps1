@@ -1,5 +1,5 @@
 Write-Output "Starting installation..."
-$shellexec = $PSScriptRoot+"\red.exe --path=%1"
+$shellexec = $PSScriptRoot+'\red.exe --path="%1"'
 $contextMenuName = "Redify"
 Write-Output "Working directory "$shellexec
 #Set-ItemProperty -Path Registry::HKEY_CURRENT_USER\Software\Classes\directory\$contextMenuName -Name command -Value $shellexec

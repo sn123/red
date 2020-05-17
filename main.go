@@ -36,7 +36,7 @@ func main() {
 
 func hijack(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := `<html>
+		start := `
 		<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style>
@@ -45,8 +45,13 @@ func hijack(h http.Handler) http.Handler {
 			a { display: block; padding: 10px;color:#fff;border-bottom:1px solid #333;margin:0 0 3px;}
 			.text-muted {text-align:center;font-size:0.8em;}
 			pre { white-space: unset;}
+			p.text-muted a {display: inline-block;padding:5px;}
 		</style>
 		</head><body>
+		`
+		end := `
+			<p class="text-muted">Powered by <a href="https://github.com/sn123/red">Red</a></p>
+			</body>
 		`
 		recorder := httptest.NewRecorder()
 		h.ServeHTTP(recorder, r) // call original
@@ -54,13 +59,21 @@ func hijack(h http.Handler) http.Handler {
 		w.Header().Set("Content-Type", header)
 		if !strings.HasPrefix(header, "text/html") {
 			io.Copy(w, recorder.Result().Body)
+			recorder.Result().Body.Close()
 			return
 		}
-		// time to hijack the response else we let it go through
-		fmt.Fprintf(w, start)
 		rsp, _ := ioutil.ReadAll(recorder.Result().Body)
+		stringResponse := string(rsp)
+		isSnippet := strings.HasPrefix(stringResponse, "<pre>")
+		if isSnippet {
+			// time to hijack the response else we let it go through
+			fmt.Fprintf(w, start)
+		}
 		fmt.Fprintf(w, string(rsp))
-		fmt.Fprint(w, "<p class=\"text-muted\">Powered by Red</p></body></html>")
+		if isSnippet {
+			// time to hijack the response else we let it go through
+			fmt.Fprint(w, end)
+		}
 		// not sure why doing a defer close causes writer to go blank?
 		recorder.Result().Body.Close()
 	})

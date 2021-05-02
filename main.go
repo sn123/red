@@ -16,13 +16,18 @@ import (
 	"github.com/phayes/freeport"
 )
 
+var fallback = false
+var rootPath http.Dir
+
 func main() {
-	port, path := parseFlags()
+	port, path, fallbackResource := parseFlags()
 	if path == "" {
 		path = "./"
 	}
+	fallback = fallbackResource
 	log.Printf("Redifying %s", path)
-	fs := http.FileServer(http.Dir(path))
+	rootPath = http.Dir(path)
+	fs := http.FileServer(rootPath)
 	http.Handle("/", hijack(fs))
 	ip, port := getOutboundIP(port)
 	log.Printf("Listening on %s:%d", ip, port)
@@ -53,6 +58,16 @@ func hijack(h http.Handler) http.Handler {
 			<p class="text-muted">Powered by <a href="https://github.com/sn123/red">Red</a></p>
 			</body>
 		`
+		f, err := rootPath.Open(r.URL.Path)
+		if err == nil {
+			// we found the file do nothing
+			log.Printf("found the file %s", r.URL.Path)
+			f.Close()
+		}
+		if err != nil && os.IsNotExist(err) && fallback == true {
+			log.Print("switching to fallback")
+			r.URL.Path = "/"
+		}
 		recorder := httptest.NewRecorder()
 		h.ServeHTTP(recorder, r) // call original
 		header := recorder.Result().Header.Get("Content-Type")
@@ -79,11 +94,12 @@ func hijack(h http.Handler) http.Handler {
 	})
 }
 
-func parseFlags() (int, string) {
+func parseFlags() (int, string, bool) {
 	port := flag.Int("port", 0, "port to listen on")
 	path := flag.String("path", "", "path to redify")
+	fallbackResource := flag.Bool("fs", false, "fallback to /index.html")
 	flag.Parse()
-	return *port, *path
+	return *port, *path, *fallbackResource
 }
 
 func getPort(port int) int {

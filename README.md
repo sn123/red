@@ -2,6 +2,8 @@
 <img src="https://github.com/sn123/red/raw/master/screenshots/red.png" width="100">
 
 Red is a lightweight webserver for quick file sharing between systems on same network. Red is also a static web server and can help in quickly hosting any folder and making it accessible on the intranet.
+Red also has very basic support for SPAs (Single Page Apps) by supporting a fallback to / for all 404s.
+
 It works well for accessing & downloading files from the system to the phone on the same network.
 
 Binaries can be downloaded from ![releases](https://github.com/sn123/red/releases) page.
@@ -28,6 +30,15 @@ On the phone, point your camera to the QR code
 ### Running from source
 ```bash
 $ go build
-$ ./red --path=folder-to-redify
+$ ./red --path=folder-to-redify --port= --fs=true|false
 ```
 
+### Command line Parameters
+* __path__: Path to redify, default: current folder
+* __port__: Port to listen on, default: random available port
+* __fs__: fallback to serve default root file (index.html), default: false
+### Building different architecture
+```powershell
+PS :> $env:GOOS = "linux"
+PS :>$env:GOOS = "darwin"
+```

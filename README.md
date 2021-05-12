@@ -32,7 +32,10 @@ On the phone, point your camera to the QR code
 $ go build
 $ ./red --path=folder-to-redify --port= --fs=true|false
 ```
-
+```
+### Build from source
+$ go build -ldflags="-s -w" ./
+```
 ### Command line Parameters
 * __path__: Path to redify, default: current folder
 * __port__: Port to listen on, default: random available port

@@ -32,11 +32,24 @@ func main() {
 	ip, port := getOutboundIP(port)
 	log.Printf("Listening on %s:%d", ip, port)
 	printQrCode(fmt.Sprintf("http://%s:%d", ip, port))
-	err := http.ListenAndServe(fmt.Sprintf("%s:%d", ip, port), nil)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
+	log.Printf("Listening on localhost:%d", port)
+	go func() {
+		err := http.ListenAndServe(fmt.Sprintf("%s:%d", ip, port), nil)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}()
+	go func() {
+		err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%d", port), nil)
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}()
+	var input string
+	fmt.Println("Press enter/return to exit")
+	fmt.Scanln(&input)
 }
 
 func hijack(h http.Handler) http.Handler {
@@ -80,15 +93,15 @@ func hijack(h http.Handler) http.Handler {
 		rsp, _ := ioutil.ReadAll(recorder.Result().Body)
 		stringResponse := string(rsp)
 		isSnippet := strings.HasPrefix(stringResponse, "<pre>")
-		if isSnippet {
-			// time to hijack the response else we let it go through
-			fmt.Fprintf(w, start)
+		if !isSnippet {
+			fmt.Fprint(w, string(rsp))
+			recorder.Result().Body.Close()
+			return
 		}
-		fmt.Fprintf(w, string(rsp))
-		if isSnippet {
-			// time to hijack the response else we let it go through
-			fmt.Fprint(w, end)
-		}
+
+		fmt.Fprint(w, start)
+		fmt.Fprint(w, string(rsp))
+		fmt.Fprint(w, end)
 		// not sure why doing a defer close causes writer to go blank?
 		recorder.Result().Body.Close()
 	})

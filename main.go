@@ -30,9 +30,9 @@ func main() {
 	fs := http.FileServer(rootPath)
 	http.Handle("/", hijack(fs))
 	ip, port := getOutboundIP(port)
-	log.Printf("Listening on %s:%d", ip, port)
+	log.Printf("Listening on http://%s:%d", ip, port)
 	printQrCode(fmt.Sprintf("http://%s:%d", ip, port))
-	log.Printf("Listening on localhost:%d", port)
+	log.Printf("Listening on http://localhost:%d", port)
 	go func() {
 		err := http.ListenAndServe(fmt.Sprintf("%s:%d", ip, port), nil)
 		if err != nil {

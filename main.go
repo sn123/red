@@ -146,3 +146,6 @@ func getOutboundIP(port int) (string, int) {
 
 	return localAddr.IP.String(), getPort(port)
 }
+
+func doNothing() { // Noncompliant
+}

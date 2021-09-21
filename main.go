@@ -12,8 +12,6 @@ import (
 	"os"
 	"strings"
 
-	"log"
-
 	qrcode "github.com/Baozisoftware/qrcode-terminal-go"
 	"github.com/phayes/freeport"
 )
@@ -147,4 +145,7 @@ func getOutboundIP(port int) (string, int) {
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 
 	return localAddr.IP.String(), getPort(port)
+}
+
+func doNothing() { // Noncompliant
 }
